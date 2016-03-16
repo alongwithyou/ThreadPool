@@ -1,7 +1,8 @@
 # std::thread based thread pool
 A simple std::thread based thread pool with a parallel-for loop implementation.
 
-A simple example of how to perform STREAM benchmark scale operation in parallel:
+
+Example of how to perform STREAM benchmark scale operation in parallel:
 ```C++
 #include "ThreadPool.hh"
 
