@@ -1,6 +1,4 @@
 
-#define SERIAL_OPERATION(name, function_kernal) class name { public: static void Serial(const int& i) { function_kernal; } };
-
 #include "ThreadPool.hh"
 
 static double* a;

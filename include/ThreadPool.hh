@@ -47,3 +47,6 @@ private:
         mutable mutex m_taskmutex;
 
 };
+
+// Macro to define a static class function which can be called via ThreadPool::ParallelFor<T>
+#define SERIAL_OPERATION(name, function_kernal) class name { public: static void Serial(const int& i) { function_kernal; } };
