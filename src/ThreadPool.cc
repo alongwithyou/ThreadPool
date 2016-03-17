@@ -18,6 +18,7 @@ void ThreadPool::Enqueue(function<void()> task) {
         }
         m_condition.notify_one();
 }
+
 void ThreadPool::Worker() {
         function<void()> work;
         while(true) {
@@ -37,4 +38,18 @@ void ThreadPool::Worker() {
 }
 void ThreadPool::JoinAll() {
         for (auto& worker : m_workers) { worker.join(); }
+}
+
+void ThreadPool::MapRange(const function<void(int)>& func, const size_t begin, const size_t end)
+{
+    int chunkSize = (end - begin) / m_nthreads;
+    for (int i = 0; i < m_nthreads; i++) {
+        Enqueue([=]{
+            int threadstart = begin + i*chunkSize;
+            int threadstop = (i == m_nthreads - 1) ? end : threadstart + chunkSize;
+            for (int it = threadstart; it < threadstop; ++it) {
+                func(it);
+            }
+        });
+    }
 }

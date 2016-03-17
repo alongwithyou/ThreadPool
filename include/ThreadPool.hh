@@ -35,6 +35,8 @@ public:
                 }
         }
 
+        void MapRange(const function<void(int)>& func, const size_t begin, const size_t end);
+
 private:
         // threads and task queue
         int m_nthreads;
