@@ -28,6 +28,9 @@ TEST_CASE("Parallel for with MapRange")
     size_t N = 1000;
     ScalingFunctor sf(N);
 
+    REQUIRE(sf.a.size() == N);
+    REQUIRE(sf.b.size() == N);
+
     SECTION("Serial version works")
     {
         for (size_t i = 0; i < N; i++) {
@@ -36,9 +39,9 @@ TEST_CASE("Parallel for with MapRange")
         }
     }
 
-    SECTION("Parallel version works")
+    SECTION("Parallel version works with one thread")
     {
-        ThreadPool pool(4);
+        ThreadPool pool(1);
         pool.MapRange(sf, 0, N);
 
         for (size_t i = 0; i < N; i++) {
