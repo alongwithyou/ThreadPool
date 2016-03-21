@@ -10,5 +10,5 @@ add_library(ThreadPool SHARED src/ThreadPool.cc)
 install(TARGETS ThreadPool LIBRARY DESTINATION lib)
 install(FILES include/ThreadPool.hh DESTINATION include)
 
-add_executable(test_ThreadPool test/test_ThreadPool.cc)
+add_executable(test_ThreadPool test/test_ParallelMap.cc test/catch_main.cc)
 target_link_libraries(test_ThreadPool ThreadPool)
