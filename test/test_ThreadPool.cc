@@ -4,48 +4,33 @@
 #include <vector>
 #include <numeric>
 
-class ScalingFunctor
-{
-public:
-    ScalingFunctor(const size_t N)
-    {
-        a.resize(N);
-        b.resize(N);
-        std::iota(b.begin(), b.end(), 0);
-    }
-
-    void operator()(const size_t i)
-    {
-        a.at(i) = 4*b.at(i);
-    }
-
-    std::vector<double> a;
-    std::vector<double> b;
-};
-
 TEST_CASE("Parallel for with MapRange")
 {
     size_t N = 1000;
-    ScalingFunctor sf(N);
 
-    REQUIRE(sf.a.size() == N);
-    REQUIRE(sf.b.size() == N);
-
-    SECTION("Serial version works")
-    {
-        for (size_t i = 0; i < N; i++) {
-            sf(i);
-            REQUIRE(sf.a.at(i) == Approx(4*sf.b.at(i)));
-        }
-    }
+    std::vector<double> a (N);
+    std::vector<double> b (N);
+    std::iota(a.begin(), a.end(), 0);
 
     SECTION("Parallel version works with one thread")
     {
         ThreadPool pool(1);
-        pool.MapRange(sf, 0, N);
+        std::function<double(double)> workFxn ([](double v)->double{ return 4*v; });
+        pool.ParallelMap(a.begin(), a.end(), b.begin(), workFxn);
 
         for (size_t i = 0; i < N; i++) {
-            REQUIRE(sf.a.at(i) == Approx(4*sf.b.at(i)));
+            REQUIRE(b.at(i) == Approx(4*a.at(i)));
+        }
+    }
+
+    SECTION("Parallel version works with four threads")
+    {
+        ThreadPool pool(4);
+        std::function<double(double)> workFxn ([](double v)->double{ return 4*v; });
+        pool.ParallelMap(a.begin(), a.end(), b.begin(), workFxn);
+
+        for (size_t i = 0; i < N; i++) {
+            REQUIRE(b.at(i) == Approx(4*a.at(i)));
         }
     }
 }

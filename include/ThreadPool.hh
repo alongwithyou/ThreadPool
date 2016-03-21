@@ -35,7 +35,21 @@ public:
                 }
         }
 
-        void MapRange(const function<void(int)>& func, const size_t begin, const size_t end);
+        template<typename InputIt, typename T>
+        void ParallelMap(InputIt begin, InputIt end, InputIt outputBegin, const std::function<T(T)>& func)
+        {
+            int chunkSize = (end - begin) / m_nthreads;
+            for (int i = 0; i < m_nthreads; i++) {
+                m_taskQueue.push([=]{
+                    InputIt threadBegin = begin + i*chunkSize;
+                    InputIt threadOutput = outputBegin + i*chunkSize;
+                    InputIt threadEnd = (i == m_nthreads - 1) ? end : threadBegin + chunkSize;
+                    while (threadBegin != threadEnd) {
+                        *(threadOutput++) = func(*(threadBegin++));
+                    }
+                });
+            }
+        }
 
 private:
         // threads and task queue
