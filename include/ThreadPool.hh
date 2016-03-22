@@ -23,24 +23,6 @@ public:
         void Worker();
         void JoinAll();
 
-        template <typename ClassFunction>
-        void ParallelFor(uint32_t begin, uint32_t end) {
-
-                int chunk = (end - begin) / m_nthreads;
-                for (int i = 0; i < m_nthreads; ++i) {
-                        m_promises.emplace_back();
-                        int mypromise = m_promises.size() - 1;
-                        Enqueue([=]{
-                                        int threadstart = begin + i*chunk;
-                                        int threadstop = (i == m_nthreads - 1) ? end : threadstart + chunk;
-                                        for (int it = threadstart; it < threadstop; ++it) {
-                                                ClassFunction::SerialFunction(it);
-                                        }
-                                        m_promises[mypromise].set_value();
-                                });
-                }
-                Finish();
-        }
         template <typename T, typename... Params>
         void ParallelFor(uint32_t begin, uint32_t end, T SerialFunction, Params&&... params) {
 
@@ -79,6 +61,3 @@ private:
         atomic<int> m_nrunning;
 
 };
-
-// Macro to define a static class function which can be called via ThreadPool::ParallelFor<T>
-#define SERIAL_OPERATION(name, function_kernal) class name { public: static void SerialFunction(const int& i) { function_kernal; } };
