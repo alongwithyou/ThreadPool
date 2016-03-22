@@ -8,6 +8,7 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <utility>
 
 using namespace std;
 
@@ -30,6 +31,20 @@ public:
                                         int threadstop = (i == m_nthreads - 1) ? end : threadstart + chunk;
                                         for (int it = threadstart; it < threadstop; ++it) {
                                                 ClassFunction::Serial(it);
+                                        }
+                                });
+                }
+        }
+        template <typename T, typename... Params>
+        void ParallelFor(uint32_t begin, uint32_t end, T func, Params&&... params) {
+
+                int chunk = (end - begin) / m_nthreads;
+                for (int i = 0; i < m_nthreads; ++i) {
+                        Enqueue([=]{
+                                        uint32_t threadstart = begin + i*chunk;
+                                        uint32_t threadstop = (i == m_nthreads - 1) ? end : threadstart + chunk;
+                                        for (uint32_t it = threadstart; it < threadstop; ++it) {
+                                                func(it, params...);
                                         }
                                 });
                 }
