@@ -27,3 +27,4 @@ int main () {
 }
 
 ```
+See example.cc for a more detailed example.
