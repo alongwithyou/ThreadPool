@@ -4,26 +4,25 @@ A simple std::thread based thread pool with a parallel-for loop implementation.
 
 Example of how to perform STREAM benchmark scale operation in parallel:
 ```C++
-#include "ThreadPool.hh"
-
-static double* a;
-static double* b;
-
-using namespace std;
+void scale(int i, double* a, double* b) {
+        a[i]=4*b[i];
+}
 
 int main () {
 
-        ThreadPool pool(4);
+        ThreadPool pool(8);
 
-        int N = 1e7;
-        a = (double*)calloc(N,sizeof(double));
-        b = (double*)calloc(N,sizeof(double));
+        int N = 1e9;
+        auto a = (double*)calloc(N,sizeof(double));
+        auto b = (double*)calloc(N,sizeof(double));
         for (int i=0; i<N; i++) { b[i] = i; }
 
-        SERIAL_OPERATION(scale, a[i]=4*b[i]);
-        pool.ParallelFor<scale>(0,N);
+        {
+            Timer timer([&](int elapsed) { cout << elapsed*1e-6 << " ms\n"; });
+            pool.ParallelFor(0,N,scale,a,b);
+        }
 
-        cin.get();
+
         return 0;
 }
 
