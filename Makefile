@@ -1,5 +1,28 @@
 define WELCOME_MESSAGE
 default.inc not found, generating now
+-----------------------------------------------------
+|                                                   |
+|             Magic C/C++ Makefile                  |
+|               - Courtesy of E. Lunderberg         |
+|                                                   |
+-----------------------------------------------------
+
+  This is a makefile intended for compiling any
+C/C++ project.  It will find all source files,
+compile them appropriately into executables and
+libraries, and track all dependencies.
+
+  The makefile itself should not need to be
+modified.  A "default.inc" file has been generated,
+which contains many options for customizing the
+behavior of the makefile for your particular
+project.  The initial behavior assumes that most source
+files are located in src, include files are
+located in include, and source files containing
+"int main()" are in the main directory.
+
+  Additional description of the behavior of the
+makefile can be found in "default.inc"
 endef #WELCOME_MESSAGE
 
 define DEFAULT_INC_CONTENTS
