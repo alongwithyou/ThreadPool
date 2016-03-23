@@ -12,6 +12,15 @@ void scale(int i, double* a, double* b) {
         a[i]=4*b[i];
 }
 
+struct A {
+
+        void scale(int i, double* a, double* b) {
+                a[i]=4*b[i];
+        }
+
+        int x = 1;
+
+};
 int main () {
 
         ThreadPool pool(8);
@@ -27,17 +36,28 @@ int main () {
 
         int ntrials = 10;
         double tperformance = 0.0;
+        cout << "Callable: c-function pointer\n";
         for (int i=0; i<ntrials; i++)
         {
-            Timer timer([&](int elapsed){
-                cout << "Trial " << i << ": "<< elapsed*1e-6 << " ms\n";
-                tperformance+=elapsed;
-            });
-            pool.ParallelFor(0,N,scale,a,b);
+                Timer timer([&](int elapsed){
+                                cout << "Trial " << i << ": "<< elapsed*1e-6 << " ms\n";
+                                tperformance+=elapsed;
+                        });
+                pool.ParallelFor(0,N,scale,a,b);
         }
         cout << "Average: " << tperformance*1e-6 / ntrials << " ms\n\n";
 
-
+        tperformance = 0.0;
+        cout << "Callable: lambda function (without capture) \n";
+        for (int i=0; i<ntrials; i++)
+        {
+                Timer timer([&](int elapsed){
+                                cout << "Trial " << i << ": "<< elapsed*1e-6 << " ms\n";
+                                tperformance+=elapsed;
+                        });
+                pool.ParallelFor(0,N,[](int k, double* a, double* b) {return a[k] = 4*b[k];},a,b);
+        }
+        cout << "Average: " << tperformance*1e-6 / ntrials << " ms\n\n";
 
         return 0;
 }
