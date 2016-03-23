@@ -17,22 +17,10 @@ int main () {
         auto b = (double*)calloc(N,sizeof(double));
         for (int i=0; i<N; i++) { b[i] = i; }
 
-
-        // cold start for timing purposes
-        pool.ParallelFor(0,N,scale,a,b);
-
-        int ntrials = 10;
-        double tperformance = 0.0;
-        for (int i=0; i<ntrials; i++)
         {
-            Timer timer([&](int elapsed) {
-                cout << "Trial " << i << ": "<< elapsed*1e-6 << " ms\n";
-                tperformance+=elapsed;
-            });
+            Timer timer([&](int elapsed) { cout << elapsed*1e-6 << " ms\n"; });
             pool.ParallelFor(0,N,scale,a,b);
         }
-        cout << "Average: " << tperformance*1e-6 / ntrials << " ms\n\n";
-
 
 
         return 0;
