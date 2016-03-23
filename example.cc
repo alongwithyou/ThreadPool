@@ -12,15 +12,6 @@ void scale(int i, double* a, double* b) {
         a[i]=4*b[i];
 }
 
-struct A {
-
-        void scale(int i, double* a, double* b) {
-                a[i]=4*b[i];
-        }
-
-        int x = 1;
-
-};
 int main () {
 
         ThreadPool pool(8);
