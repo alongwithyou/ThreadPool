@@ -27,3 +27,7 @@ void ThreadPool::Worker() {
 void ThreadPool::JoinAll() {
         for (auto& worker : m_workers) { worker.join(); }
 }
+void ThreadPool::Finish() {
+    for (auto& promise : m_promises) promise.get_future().get();
+    m_promises.clear();
+}
