@@ -9,9 +9,10 @@
 #include <utility>
 #include <future>
 
-#include "ThreadsafeQueue.hh"
+#include "concurrentqueue.h"
 
 using namespace std;
+using namespace moodycamel;
 
 typedef std::function<void()> WorkType;
 
@@ -32,7 +33,7 @@ public:
                 for (int i = 0; i < m_nthreads; ++i) {
                         m_promises.emplace_back();
                         int mypromise = m_promises.size() - 1;
-                        m_taskQueue.push([=]{
+                        m_taskQueue.enqueue([=]{
                                         uint32_t threadstart = begin + i*chunk;
                                         uint32_t threadstop = (i == m_nthreads - 1) ? end : threadstart + chunk;
                                         for (uint32_t it = threadstart; it < threadstop; ++it) {
@@ -41,7 +42,8 @@ public:
                                         m_promises[mypromise].set_value();
                                 });
                 }
-                m_taskQueue.pop()(); // master thread is also a worker
+                WorkType work;
+                if (m_taskQueue.try_dequeue(work)) work(); // master thread is also a worker
                 Finish();
         }
         template<typename InputIt, typename T>
@@ -51,17 +53,17 @@ public:
             for (int i = 0; i < m_nthreads; i++) {
                 m_promises.emplace_back();
                 int mypromise = m_promises.size() - 1;
-                m_taskQueue.push([=]{
+                m_taskQueue.enqueue([=]{
                     InputIt threadBegin = begin + i*chunkSize;
                     InputIt threadOutput = outputBegin + i*chunkSize;
                     InputIt threadEnd = (i == m_nthreads - 1) ? end : threadBegin + chunkSize;
                     while (threadBegin != threadEnd) {
                         *(threadOutput++) = func(*(threadBegin++));
                     }
-                    m_promises[mypromise].set_value(); // master thread is also a worker
+                    m_promises[mypromise].set_value();
                 });
             }
-            m_taskQueue.pop()();
+            if (m_taskQueue.try_dequeue(work)) work(); // master thread is also a worker
             Finish();
         }
 
@@ -72,7 +74,7 @@ private:
         vector<promise<void>> m_promises;
         bool m_stopWorkers;
 
-        ThreadsafeQueue<WorkType> m_taskQueue;
+        ConcurrentQueue<WorkType> m_taskQueue;
 };
 
 #endif /* end of include guard: THREADPOOL_H */

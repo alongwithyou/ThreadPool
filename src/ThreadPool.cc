@@ -15,8 +15,7 @@ void ThreadPool::Worker() {
     while(true) {
         function<void()> work;
         try {
-            work = m_taskQueue.pop();
-            work();
+            if (m_taskQueue.try_dequeue(work)) work();
         }
         catch (const ThreadsafeQueue<WorkType>::QueueFinished&)
         {
