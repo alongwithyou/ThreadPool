@@ -7,20 +7,14 @@ ThreadPool::ThreadPool(uint32_t numthreads) : m_nthreads(numthreads), m_stopWork
 }
 ThreadPool::~ThreadPool() {
     m_stopWorkers = true;
-    m_taskQueue.join();
     JoinAll();
 }
 
 void ThreadPool::Worker() {
     while(true) {
         function<void()> work;
-        try {
-            if (m_taskQueue.try_dequeue(work)) work();
-        }
-        catch (const ThreadsafeQueue<WorkType>::QueueFinished&)
-        {
-            return;
-        }
+        if (m_taskQueue.try_dequeue(work)) work();
+        if (m_stopWorkers) return;
     }
 }
 void ThreadPool::JoinAll() {

@@ -63,6 +63,7 @@ public:
                     m_promises[mypromise].set_value();
                 });
             }
+            WorkType work;
             if (m_taskQueue.try_dequeue(work)) work(); // master thread is also a worker
             Finish();
         }
