@@ -42,7 +42,6 @@ public:
                                         m_promises[mypromise].set_value();
                                 });
                 }
-                //m_taskQueue.pop()(); // master thread is also a worker
                 Finish();
         }
         template<typename InputIt, typename T>
@@ -59,10 +58,9 @@ public:
                     while (threadBegin != threadEnd) {
                         *(threadOutput++) = func(*(threadBegin++));
                     }
-                    m_promises[mypromise].set_value(); // master thread is also a worker
+                    m_promises[mypromise].set_value();
                 });
             }
-            //m_taskQueue.pop()();
             Finish();
         }
 
