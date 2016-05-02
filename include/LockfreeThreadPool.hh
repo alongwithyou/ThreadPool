@@ -1,5 +1,5 @@
-#ifndef THREADPOOL_H
-#define THREADPOOL_H
+#ifndef LOCKFREETHREADPOOL_H
+#define LOCKFREETHREADPOOL_H
 
 #include <iostream>
 #include <chrono>
@@ -16,10 +16,10 @@ using namespace moodycamel;
 
 typedef std::function<void()> WorkType;
 
-class ThreadPool {
+class LockfreeThreadPool {
 public:
-        ThreadPool(uint32_t numthreads);
-        ~ThreadPool();
+        LockfreeThreadPool(uint32_t numthreads);
+        ~LockfreeThreadPool();
 
         void Enqueue(function<void()> task);
         void Worker();
@@ -42,8 +42,6 @@ public:
                                         m_promises[mypromise].set_value();
                                 });
                 }
-                WorkType work;
-                if (m_taskQueue.try_dequeue(work)) work(); // master thread is also a worker
                 Finish();
         }
         template<typename InputIt, typename T>
@@ -63,8 +61,6 @@ public:
                     m_promises[mypromise].set_value();
                 });
             }
-            WorkType work;
-            if (m_taskQueue.try_dequeue(work)) work(); // master thread is also a worker
             Finish();
         }
 
