@@ -1,5 +1,5 @@
-#ifndef THREADPOOL_H
-#define THREADPOOL_H
+#ifndef LOCKFREETHREADPOOL_H
+#define LOCKFREETHREADPOOL_H
 
 #include <iostream>
 #include <chrono>
@@ -9,16 +9,17 @@
 #include <utility>
 #include <future>
 
-#include "ThreadsafeQueue.hh"
+#include "concurrentqueue.h"
 
 using namespace std;
+using namespace moodycamel;
 
 typedef std::function<void()> WorkType;
 
-class ThreadPool {
+class LockfreeThreadPool {
 public:
-        ThreadPool(uint32_t numthreads);
-        ~ThreadPool();
+        LockfreeThreadPool(uint32_t numthreads);
+        ~LockfreeThreadPool();
 
         void Enqueue(function<void()> task);
         void Worker();
@@ -33,7 +34,7 @@ public:
                 for (int i = 0; i < n_tasks; ++i) {
                         m_promises.emplace_back();
                         int mypromise = m_promises.size() - 1;
-                        m_taskQueue.push([=]{
+                        m_taskQueue.enqueue([=]{
                                         uint32_t threadstart = begin + i*chunk;
                                         uint32_t threadstop = (i == n_tasks - 1) ? end : threadstart + chunk;
                                         for (uint32_t it = threadstart; it < threadstop; ++it) {
@@ -51,7 +52,7 @@ public:
             for (int i = 0; i < m_nthreads; i++) {
                 m_promises.emplace_back();
                 int mypromise = m_promises.size() - 1;
-                m_taskQueue.push([=]{
+                m_taskQueue.enqueue([=]{
                     InputIt threadBegin = begin + i*chunkSize;
                     InputIt threadOutput = outputBegin + i*chunkSize;
                     InputIt threadEnd = (i == m_nthreads - 1) ? end : threadBegin + chunkSize;
@@ -71,7 +72,7 @@ private:
         vector<promise<void>> m_promises;
         bool m_stopWorkers;
 
-        ThreadsafeQueue<WorkType> m_taskQueue;
+        ConcurrentQueue<WorkType> m_taskQueue;
 };
 
 #endif /* end of include guard: THREADPOOL_H */
