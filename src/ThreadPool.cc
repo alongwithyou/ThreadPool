@@ -1,7 +1,8 @@
 #include "ThreadPool.hh"
 
 ThreadPool::ThreadPool(uint32_t numthreads) : m_nthreads(numthreads), m_stopWorkers(false) {
-    for (uint32_t i=0; i<numthreads-1;i++) { // -1 b/c main thread is also a worker
+    //for (uint32_t i=0; i<numthreads-1;i++) { // -1 b/c main thread is also a worker
+    for (uint32_t i=0; i<numthreads;i++) {
         m_workers.emplace_back(&ThreadPool::Worker, this);
     }
 }
