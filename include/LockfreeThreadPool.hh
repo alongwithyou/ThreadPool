@@ -27,15 +27,16 @@ public:
         void Finish();
 
         template <typename T, typename... Params>
-        void ParallelFor(uint32_t begin, uint32_t end, T SerialFunction, Params&&... params) {
+        void ParallelFor(uint32_t begin, uint32_t end, int32_t n_tasks, T SerialFunction, Params&&... params) {
 
-                int chunk = (end - begin) / m_nthreads;
-                for (int i = 0; i < m_nthreads; ++i) {
+                n_tasks = (n_tasks >= m_nthreads) ? n_tasks : m_nthreads;
+                int chunk = (end - begin) / n_tasks;
+                for (int i = 0; i < n_tasks; ++i) {
                         m_promises.emplace_back();
                         int mypromise = m_promises.size() - 1;
                         m_taskQueue.enqueue([=]{
                                         uint32_t threadstart = begin + i*chunk;
-                                        uint32_t threadstop = (i == m_nthreads - 1) ? end : threadstart + chunk;
+                                        uint32_t threadstop = (i == n_tasks - 1) ? end : threadstart + chunk;
                                         for (uint32_t it = threadstart; it < threadstop; ++it) {
                                                 SerialFunction(it, params...);
                                         }
