@@ -30,7 +30,7 @@ public:
                 n_tasks = (n_tasks >= m_workers.size()) ? n_tasks : m_workers.size();
                 m_tasksRemaining = n_tasks;
                 int chunk = (end - begin) / n_tasks;
-                for (int i = 0; i < n_tasks; ++i) {
+                for (auto i = 0u; i < n_tasks; ++i) {
                         AddTask([=]{
                                         uint32_t threadstart = begin + i*chunk;
                                         uint32_t threadstop = (i == n_tasks - 1) ? end : threadstart + chunk;
