@@ -15,7 +15,7 @@ typedef std::function<void()> WorkType;
 
 class ThreadPoolBase {
 public:
-        ThreadPoolBase() = default;
+        ThreadPoolBase() : m_stopWorkers(false) {}
 
         virtual void AddTask(function<void()> task) = 0;
 
