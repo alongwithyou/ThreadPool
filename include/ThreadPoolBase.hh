@@ -22,7 +22,9 @@ public:
 
         virtual void Worker() = 0;
         virtual void CleanUp() { m_stopWorkers = true; }
-        void JoinAll();
+        void JoinAll() {
+                for (auto& worker : m_workers) { worker.join(); }
+        }
 
         template <typename T, typename... Params>
         void ParallelFor(uint32_t begin, uint32_t end, uint32_t n_tasks, T SerialFunction, Params&&... params) {
